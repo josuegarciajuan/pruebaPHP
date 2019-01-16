@@ -11,4 +11,6 @@
 |
 */
 
-Route::get('tests', 'LeadController@detalle_lead');
+
+
+Route::get('/', 'IndexController@show');

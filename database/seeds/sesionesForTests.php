@@ -15,18 +15,18 @@ class sesionesForTests extends Seeder
     {
 
     	$sesiones = [
-    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2018-1-17 20:00:00')],
-    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2018-1-17 22:30:00')],
-    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2018-1-18 20:00:00')],
-    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2018-1-18 22:30:00')],
-    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2018-1-19 17:00:00')],
-    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2018-1-19 20:00:00')],
-    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2018-1-19 22:30:00')],
-    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2018-1-19 01:00:00')],
-    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2018-1-21 20:00:00')],
-    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2018-1-21 22:30:00')],
-    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2018-1-22 20:00:00')],
-    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2018-1-22 22:30:00')],
+    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2019-1-17 20:00:00')],
+    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2019-1-17 22:30:00')],
+    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2019-1-18 20:00:00')],
+    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2019-1-18 22:30:00')],
+    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2019-1-19 17:00:00')],
+    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2019-1-19 20:00:00')],
+    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2019-1-19 22:30:00')],
+    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2019-1-19 01:00:00')],
+    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2019-1-21 20:00:00')],
+    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2019-1-21 22:30:00')],
+    		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2019-1-22 20:00:00')],
+    		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2019-1-22 22:30:00')],
     	];
 
     	for($i=0;$i<count($sesiones);$i++){
