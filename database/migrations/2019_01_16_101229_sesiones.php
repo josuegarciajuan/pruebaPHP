@@ -18,6 +18,19 @@ class Sesiones extends Migration
             $table->string('nombre_obra');
             $table->timestamp('inicio')->nullable();
         });
+
+
+        Schema::table('reservas', function($table) {
+            $table->foreign('sesion_id')
+              ->references('id')->on('sesiones')
+              ->onDelete('cascade'); 
+        });
+        Schema::table('butacas', function($table) {
+            $table->foreign('sesion_id')
+              ->references('id')->on('sesiones')
+              ->onDelete('cascade'); 
+        });
+        
     }
 
     /**
@@ -27,6 +40,8 @@ class Sesiones extends Migration
      */
     public function down()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
         Schema::dropIfExists('sesiones');
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

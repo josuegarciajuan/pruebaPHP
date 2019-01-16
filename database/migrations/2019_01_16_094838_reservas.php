@@ -25,9 +25,7 @@ class Reservas extends Migration
             $table->foreign('user_id')
               ->references('id')->on('users')
               ->onDelete('cascade');
-            $table->foreign('sesion_id')
-              ->references('id')->on('sesiones')
-              ->onDelete('cascade');  
+             
         });
     }
 
@@ -38,6 +36,8 @@ class Reservas extends Migration
      */
     public function down()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
         Schema::dropIfExists('reservas');
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

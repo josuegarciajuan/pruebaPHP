@@ -15,7 +15,7 @@ class Butacas extends Migration
     {
         Schema::create('butacas', function (Blueprint $table) {
             $table->increments('id');
-            table->integer('reserva_id')->unsigned()->nullable();
+            $table->integer('reserva_id')->unsigned()->nullable();
             $table->integer('sesion_id')->unsigned()->nullable();
             $table->integer('fila')->unsigned();
             $table->integer('columna')->unsigned();
@@ -25,9 +25,6 @@ class Butacas extends Migration
             $table->foreign('reserva_id')
               ->references('id')->on('reservas')
               ->onDelete('cascade');
-            $table->foreign('sesion_id')
-              ->references('id')->on('sesiones')
-              ->onDelete('cascade');  
         });
     }
 
@@ -38,6 +35,8 @@ class Butacas extends Migration
      */
     public function down()
     {
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
         Schema::dropIfExists('butacas');
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }
