@@ -1,3 +1,7 @@
+<div class="row" >
+	<div class="col" ><h5>Rellena tus datos para terminar la reserva:</h5></div>
+</div>
+<div class="row mt-5"></div>
 <form id="the-form" method="POST" action="reservar">
 {{ csrf_field() }}
 	<div class="row" >
@@ -30,7 +34,7 @@
 
 
 	  </div>
-	  <div class="col-md-1 ">
+	  <div class="col-md-1 " class="div_btn_submit">
 	    	
 			<button class="btn btn-primary" id="btn_reservar">Reservar</button>
 

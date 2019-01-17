@@ -16,7 +16,7 @@
 			</div>  			
   		</div>
   	</div>
-  	
+
     <div class="col-md-7">
   		<div class="container" >
   			<div class="row">
@@ -29,6 +29,10 @@
   		</div>
     </div>
   </div>
+
+  
+  <hr />
+  <div class="row mt-2"></div>
   <div class="row">
   @include('index.formulario')
   </div>

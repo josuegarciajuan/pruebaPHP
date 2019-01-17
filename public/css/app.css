@@ -16,3 +16,9 @@
 	width:25px;
 	cursor:pointer;
 }
+
+
+.div_btn_submit{
+	display: flex;
+  	align-items: center;	
+}
