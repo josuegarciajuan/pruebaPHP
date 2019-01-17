@@ -40,6 +40,17 @@ class IndexController extends Controller
     }
 
 
+	/**
+     * carga los horarios de las seiosnes para 1 dia y una obra dados
+     *
+     * @param  request (nombre obra, mes, year)
+     * @return \Illuminate\Http\Response
+     */
+    public function cargaSesiones(Request $request){
+    	$data["sesiones"]=$this->sesiones_proximas($request->date,$request->nombre_obra);
+    	return json_encode($data);
+
+    }
 
 
     /**
@@ -70,9 +81,12 @@ class IndexController extends Controller
 		$data["colores"]=$this->cargaColores($data["sesiones_mes"],$data["butacas_ocupadas_dia"],$butacas_totales);
 		
 		$data["hoy"]=date("Y-m-d");
+		$data["hoy_mostrable"]=date("d-m-Y");
 		$data["mes"]=date("m");
 		$data["year"]=date("Y");
 
+
+		$data["salon"]=$this->cargaSalon($request->id);
     	
     	//dd($data);
         return $data;
@@ -250,4 +264,41 @@ class IndexController extends Controller
 		}
 		return $data["colores"];
     }
+
+    /**
+     * devuelve el estado de los asientos de una salon
+     *
+     * @param   id_sesion
+     * @return array de butacas con sus estados
+     */
+    private function cargaSalon($id_sesion){
+    	$salon=[];
+
+
+$butacas_totales=Config('constants.options.filas_sala')*Config('constants.options.columnas_sala');
+
+
+		//butacas resevadas en esa sesion  (directo el seiosn id)
+		$butacas_reservadas=Butaca::whereHas('sesion', function ($query) use ($id_sesion) {
+    		$query->where('sesion_id', $id_sesion);
+		})->get();
+		 
+		//butacas bloqueadas por esa sesion		(sacar las reservas con sesion_id)
+		$butacas_bloqueadas=Butaca::where("sesion_id",$id_sesion)->get()
+
+		$butacas_ocupadas = array_merge($butacas_reservadas, $butacas_bloqueadas);
+
+
+		for($i=1;$i<=Config('constants.options.filas_sala');$i++){
+			for($j=1;$j<=Config('constants.options.columnas_sala');$j++){
+
+			}
+		}
+
+
+    	return $salon;
+
+
+    }
+
 }

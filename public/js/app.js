@@ -59,6 +59,11 @@ $(function() {
 			td=$("td").find("[data-date='" + date.format() + "']");
 			td.css("background-color", "blue");
 			td.children().css("background-color", "blue");
+
+			$("#muestra_dia").html(date.format("D-M-Y"));
+			carga_sesiones(date.format());
+			
+
 		
 		}
 
@@ -66,6 +71,8 @@ $(function() {
 
 
   })
+
+  cargaSala();
 
   $('button.fc-prev-button').click(function(){
 
@@ -119,4 +126,69 @@ function recargaCalendario(){
         }
     });
 
+}
+
+function carga_sesiones(date){
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $.ajax({
+        type: "POST",
+        url: url_base+'/carga_sesiones',
+        data: {date: date, nombre_obra: $("#select_obra").val()},
+        success: function (datos) {
+        	//alert(datos);
+            var obj = jQuery.parseJSON( datos );
+            
+            options="";
+            primer=true;
+            valor_cargaSala="";
+			$.each(obj.sesiones, function(i, item) {
+				vdate=item.inicio.split(" ");
+				hour=vdate[1];
+				vhour=hour.split(":");
+				hour=vhour[0]+":"+vhour[1];
+			    options+="<option value='"+item.id+"'>"+hour+"</option>";
+			    if(primer){
+			    	primer=false;
+			    	valor_cargaSala=item.id;
+			    }
+			});
+
+			$('#selectObra').html(options);
+			cargaSala(valor_cargaSala);
+        }
+    });	
+}
+function cargaSala(id=0){
+	if(id==0){
+		id=$('#selectObra').val();
+	}
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $.ajax({
+        type: "POST",
+        url: url_base+'/carga_salon',
+        data: {id: id},
+        success: function (datos) {
+        	//alert(datos);
+            var obj = jQuery.parseJSON( datos );
+
+
+    
+            $('#salon').html(html);
+
+        }
+    });	
+
+
+	
 }
