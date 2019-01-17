@@ -262,7 +262,7 @@ function bloquear(id_sesion,fila,columna){
         			break;
         		case "false":  //ya estaba reservado, mensajito de alerta, y lo marco como ya reservado
         			alert("Esta butaca ha suido reservada mientras tenia la ventana abierta.");
-        			$("#"+fila+"_"+columna).html("X");
+        			$("#"+fila+"_"+columna).html("<img class='butacas' src='"+url_images+"/rojo.png'>");
         			break;	
         		case "desmarca":  //lo desmarco y lo borro de la lista
         			$("#"+fila+"_"+columna).html("<img class='butacas' src='"+url_images+"/azul.png'>");
