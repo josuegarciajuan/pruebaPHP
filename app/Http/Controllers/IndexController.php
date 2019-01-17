@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Sesion;
 use App\Reserva;
 use App\Butaca;
+use App\User;
+
+
 use Carbon\Carbon;
 
 class IndexController extends Controller
@@ -389,6 +392,58 @@ class IndexController extends Controller
 	    	}
 	   	}
     	return $reservadaXmi;
+    }
+
+    /**
+     * realiza una reserva tras testear que todo se tiene todos los datos necesarios
+     *
+     * @param   request
+     * @return redirige a pantalla inicial mostrando mensaje de exito
+     */
+    public function reservar(Request $request){
+
+
+    	$user_aux=new User();
+    	$user=$user_aux->store($request);
+
+    	$butacas=explode(",", $request->butacas_h[0]);
+
+
+		$reserva=new Reserva([
+			'sesion_id' => $request->id_sesion_h,
+			'user_id' => $user->id,
+			'num_butacas' => count($butacas),
+		]);
+        $reserva->save();
+
+
+        for($i=0;$i<count($butacas);$i++){
+        	$butaca_coord=$butacas[$i];
+        	$aux=explode("_", $butaca_coord);
+        	$fila=$aux[0];
+        	$columna=$aux[1];
+
+			$butaca=new Butaca([
+				'reserva_id' => $reserva->id,
+				'fila' => $fila,
+				'columna' => $columna,
+			]);
+
+        }
+    	
+        return redirect('/form/exito');
+    }
+
+    /**
+     * redirige a pantalla inicial mostrando mensaje de exito
+     *
+     * @param   request
+     * @return redirige a pantalla inicial mostrando mensaje de exito
+     */
+    public function showExito(Request $request){
+		$data=$this->carga_info($request,"");
+		$data["exito"]="true";
+    	return view('index', $data);    	
     }
 
 }

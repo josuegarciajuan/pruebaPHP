@@ -19,6 +19,14 @@
 	var filas = "{{$filas}}";
 	var columnas = "{{$columnas}}";
 	var butacas_reservadas=[];
+
+	@isset($exito)
+		if("{{$exito}}"=="true"){
+			alert("Reserva realizada correctamente. Le hemos mandado un email con la info de su reserva.");
+		}
+	@endisset
+
+	
 </script>
 
 

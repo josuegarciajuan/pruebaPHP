@@ -100,6 +100,35 @@ $(function() {
     recargaCalendario();
   });
 
+  $("#btn_reservar").on("click", function(){
+    if($("#the-form")[0].checkValidity()) {
+
+    	if(butacas_reservadas.length==0){
+    		alert("Elija alguna butaca");
+    	}else{
+
+	        $("#butacas_h").val(butacas_reservadas);
+	        $("#id_sesion_h").val($("#selectObra").val());
+
+	        $("#the-form").submit();
+
+    	}
+
+    }
+    else {
+        $("#the-form")[0].reportValidity();
+    }
+
+  });
+
+  $("#the-form").on('submit', function(evt){
+  	if($("#butacas_h").val()==""){
+  		evt.preventDefault();  
+  	}
+    
+  });
+
+
 });
 
 
@@ -210,13 +239,7 @@ function cargaSala(id=0){
 	
 }
 function bloquear(id_sesion,fila,columna){
-	//manda a reservar, o devuelve exito o qe ya estaba ocupado, lo marco como ocupado sin repintar todo solo repintaria en caso de ocupado de rojo
-	//si exito guardso en array los asientos reservados, atencion se puede desclikar un asiento  pa saber si es mio tenia qe estar clickado
-
-	//pa saver si estoy desclickando le mando el array de las ocupadas si esta ocupada y es mia es por qe qiuero dfesclickar
-
-//
-
+	
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

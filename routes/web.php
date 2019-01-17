@@ -19,3 +19,5 @@ Route::post('recarga_calendario', 'IndexController@recargaCalendario');
 Route::post('carga_sesiones', 'IndexController@cargaSesiones');
 Route::post('carga_salon', 'IndexController@cargaSalon');
 Route::post('bloquear', 'IndexController@bloquear');
+Route::post('reservar', 'IndexController@reservar');
+Route::get('/form/exito', 'IndexController@showExito');
