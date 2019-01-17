@@ -13,45 +13,173 @@ class IndexController extends Controller
     public function __construct() {
         
     }
+
     /**
-     * Display the the index form parsing the needed data
+     * llama al form principal pasandole los datos necesarios para que se cargue, se le puede pasar el nombre de la obra dsde el despleggable elegir obra
      *
-     * @param  
+     * @param  nombre_obra
      * @return \Illuminate\Http\Response
      */
-    public function show()
-    {
+    public function show(Request $request, $nombre_obra=""){
 
-    	$data["obras"]=Sesion::where("inicio",">",Carbon::now())->distinct()->get(['nombre_obra']);
-    	$data["proxima_obra"]=Sesion::where("inicio",">",Carbon::now())->orderBy("inicio","asc")->first();
+    	$data=$this->carga_info($request, $nombre_obra);
+    	return view('index', $data);
+    }
+
+
+    /**
+     * pasa los datos necesarios para llamadas asincronas una vez cargado el form
+     *
+     * @param  request (nombre obra, mes, year)
+     * @return \Illuminate\Http\Response
+     */
+    public function recargaCalendario(Request $request){
+
+		$data=$this->carga_info($request, $request->nombre_obra, $request->mes, $request->year);
+    	return json_encode($data);
+    }
+
+
+
+
+    /**
+     * recopila la info necesaria para el form principal
+     *
+     * @param  request nombre obra, mes, year
+     * @return array of data
+     */
+    private function carga_info(Request $request, $nombre_obra,$mes="", $year=""){
+    	
+    	$data["obras"]=$this->listado_obras();
+
+    	$aux=$this->proximaObra($nombre_obra,$mes, $year);
+    	$ProximaObraMes=$aux["ProximaObraMes"];
+		$ProximaObraAnyo=$aux["ProximaObraAnyo"];
+		$proximaObraFecha=$aux["proximaObraFecha"];
+		$ProximaObraNombre=$aux["ProximaObraNombre"];
+		$data["proxima_obra"]=$aux["proxima_obra"];
+
+		$data["sesiones_proximas"]=$this->sesiones_proximas($proximaObraFecha,$data["proxima_obra"]->nombre_obra);
+
+		$butacas_totales=Config('constants.options.filas_sala')*Config('constants.options.columnas_sala');
+
+		$data["butacas_ocupadas_dia"]=$this->butacas_ocupadas($ProximaObraNombre,$ProximaObraMes,$ProximaObraAnyo);
+
+		$data["sesiones_mes"] = $this->sesionesMes($ProximaObraAnyo,$ProximaObraMes,$data["proxima_obra"]->nombre_obra);
+		
+		$data["colores"]=$this->cargaColores($data["sesiones_mes"],$data["butacas_ocupadas_dia"],$butacas_totales);
+		
+		$data["hoy"]=date("Y-m-d");
+		$data["mes"]=date("m");
+		$data["year"]=date("Y");
+
+    	
+    	//dd($data);
+        return $data;
+
+    }
+
+
+    /**
+     * devuelve el listado de obras
+     *
+     * @param  
+     * @return array of objects
+     */
+    private function listado_obras(){
+    	return Sesion::where("inicio",">",Carbon::now())->distinct()->get(['nombre_obra']);
+    }
+
+
+
+    /**
+     * dBuscamos la proxima obra, si no hauy ninguna en el mes buscado se muestra la 1º desde hoy
+     *
+     * @param   $nombre_obra,$mes, $year
+     * @return array con info necesaria de la obra
+     */
+    private function proximaObra($nombre_obra,$mes, $year){
+
+    	$return=[];
+
+		
+    	$query=Sesion::where("id",">",0);
+    	if($nombre_obra!=""){
+    		$query->where("nombre_obra",$nombre_obra);
+    	}
+    	if($mes==""){
+    		$query->where("inicio",">",Carbon::now());
+    	}else{
+			$query->where("inicio",">",Carbon::parse($year."-".$mes."-01 00:00:00")->format('Y-m-d'));
+    	}
+    	$data["proxima_obra"]=$query->orderBy("inicio","asc")->first();
+
+    	if(!$data["proxima_obra"]){
+			$query=Sesion::where("id",">",0);
+	    	if($nombre_obra!=""){
+	    		$query->where("nombre_obra",$nombre_obra);
+	    	}
+	    	$query->where("inicio",">",Carbon::now());
+	    	$data["proxima_obra"]=$query->orderBy("inicio","asc")->first();
+	    	
+	    	//cargamos el mes que se esta buscando por que la ora puede ser de 1 mes anterior, y necesitamos los colores del mes que se va a pintar
+	    	$ProximaObraMes=$mes;	
+	    	$ProximaObraAnyo=$year;
+
+
+    	}else{
+			$ProximaObraMes=Carbon::parse($data["proxima_obra"]->inicio)->format('m');
+			$ProximaObraAnyo=Carbon::parse($data["proxima_obra"]->inicio)->format('Y');
+    	}
+
 
 		$proximaObraFecha=Carbon::parse($data["proxima_obra"]->inicio)->format('Y-m-d');
-		$ProximaObraMes=Carbon::parse($data["proxima_obra"]->inicio)->format('m');
-		$ProximaObraAnyo=Carbon::parse($data["proxima_obra"]->inicio)->format('Y');
 		$ProximaObraNombre=$data["proxima_obra"]->nombre_obra;
 
 
-		$data["sesiones_proximas"] = 
-		Sesion::where("inicio",">",$proximaObraFecha." 00:00:00")->
+		$return["ProximaObraMes"]=$ProximaObraMes;
+		$return["ProximaObraAnyo"]=$ProximaObraAnyo;
+		$return["proximaObraFecha"]=$proximaObraFecha;
+		$return["ProximaObraNombre"]=$ProximaObraNombre;
+		$return["proxima_obra"]=$data["proxima_obra"];
+		
+
+		return $return;
+    }
+
+    /**
+     * saca la sesiones del mes a analizar
+     *
+     * @param   $proximaObraFecha,$nombre_obra
+     * @return array de objetos
+     */
+    private function sesiones_proximas($proximaObraFecha,$nombre_obra){
+		//para el select de sesiones proximas
+		return Sesion::where("inicio",">",$proximaObraFecha." 00:00:00")->
 				where("inicio","<",$proximaObraFecha." 23:59:00")->
-				where("nombre_obra",$data["proxima_obra"]->nombre_obra)
+				where("nombre_obra",$nombre_obra)
 				->orderBy("inicio","asc")
 				->get();
+    }
 
 
-
-		//las butacas reservadas de las sesiones
+    /**
+     * calcula las butacas ocupadas para una sesion, bien por reservadas o bien por bloqueadas
+     *
+     * @param   $ProximaObraNombre,$ProximaObraMes,$ProximaObraAnyo
+     * @return array de objetos
+     */
+    private function butacas_ocupadas($ProximaObraNombre,$ProximaObraMes,$ProximaObraAnyo){
+		//las butacas reservadas de las sesiones en el mes analizado
 		$reservas=Reserva::whereHas('sesion', function ($query) use ($ProximaObraNombre,$ProximaObraMes,$ProximaObraAnyo) {
     		$query->where('nombre_obra', $ProximaObraNombre);
-    		$query->where("inicio",">=","01-".$ProximaObraMes."-".$ProximaObraAnyo)->where("inicio","<=","31-".$ProximaObraMes."-".$ProximaObraAnyo);
+    		$query->where("inicio",">=",$ProximaObraAnyo."-".$ProximaObraMes."-01")->where("inicio","<=",$ProximaObraAnyo."-".$ProximaObraMes."-31");
 		})->get();
-		//las butacas bloqueadas aun no reservadas
+		//las butacas bloqueadas aun no reservadas en el mes analizado
 		$butacas=Butaca::whereHas('sesion', function ($query) use ($ProximaObraNombre,$ProximaObraMes,$ProximaObraAnyo) {
     		$query->where('nombre_obra', $ProximaObraNombre);
-    		$query->where("inicio",">=","01-".$ProximaObraMes."-".$ProximaObraAnyo)->where("inicio","<=","31-".$ProximaObraMes."-".$ProximaObraAnyo);
+    		$query->where("inicio",">=",$ProximaObraAnyo."-".$ProximaObraMes."-01")->where("inicio","<=",$ProximaObraAnyo."-".$ProximaObraMes."-31");
 		})->get();
-
-		$butacas_totales=Config('constants.options.filas_sala')*Config('constants.options.columnas_sala');
 
 		$data["butacas_ocupadas_dia"]=[];
 		foreach ($reservas as $reserva) {
@@ -63,6 +191,7 @@ class IndexController extends Controller
 			}else{
 				$data["butacas_ocupadas_dia"][$dia]=$reserva->num_butacas;
 			}
+			
 		}
 		foreach ($butacas as $butaca) {
 			$dia=Carbon::parse($butaca->sesion->inicio)->format('d');
@@ -73,35 +202,52 @@ class IndexController extends Controller
 			}else{
 				$data["butacas_ocupadas_dia"][$dia]=1;
 			}
+			
 		}
+		return $data["butacas_ocupadas_dia"];
+    }
 
-		
-		$data["sesiones_mes"] = 
-		Sesion::where("inicio",">=","01-".$ProximaObraMes."-".$ProximaObraAnyo." 00:00:00")->
-				where("inicio","<=","31-".$ProximaObraMes."-".$ProximaObraAnyo." 23:59:00")->
-				where("nombre_obra",$data["proxima_obra"]->nombre_obra)
+
+    /**
+     * extraemos las sesiones que habran en el mes analizado
+     *
+     * @param   $ProximaObraAnyo,$ProximaObraMes,$nombre_obra
+     * @return array de objetos
+     */
+    private function sesionesMes($ProximaObraAnyo,$ProximaObraMes,$nombre_obra){
+    	return Sesion::where("inicio",">=",$ProximaObraAnyo."-".$ProximaObraMes."-01"." 00:00:00")->
+				where("inicio","<=",$ProximaObraAnyo."-".$ProximaObraMes."-31"." 23:59:00")->
+				where("nombre_obra",$nombre_obra)
 				->orderBy("inicio","asc")
 				->get();
+    }
 
+
+    /**
+     * en base a las butacas ocupadas, lo transforma en un array donde cada color representará un estado
+     *
+     * @param   $sesiones_mes,$butacas_ocupadas_dia,$butacas_totales
+     * @return array de objetos
+     */
+    private function cargaColores($sesiones_mes,$butacas_ocupadas_dia,$butacas_totales){
 		$data["colores"]=[];
+		//todo de negro ees que no hay nada
 		for($i=1;$i<=31;$i++){
 			$data["colores"][$i]="black";
+
 		}
-		foreach ($data["sesiones_mes"] as $sesion) {
+		//cargamos cuando hay sesion de blanco para que se elegible
+		foreach ($sesiones_mes as $sesion) {
 			$dia_sesion=Carbon::parse($sesion->inicio)->format('d');
 			$dia_sesion=(int)$dia_sesion;
 			$data["colores"][$dia_sesion]="white";
 		}
-		foreach($data["butacas_ocupadas_dia"] as $dia => $cantidad){
+		//si no quedan butacas, lo puintamos de red
+		foreach($butacas_ocupadas_dia as $dia => $cantidad){
 			if($cantidad==$butacas_totales){
 				$data["colores"][$dia]="red";
 			}
 		}
-		
-		$data["hoy"]=date("Y-m-d");
-
-    	
-    	//dd($data);
-        return view('index', $data);
+		return $data["colores"];
     }
 }

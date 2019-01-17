@@ -27,6 +27,7 @@ class sesionesForTests extends Seeder
     		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2019-1-21 22:30:00')],
     		["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2019-1-22 20:00:00')],
     		["nombre_obra"=>"La vida es sueño", "inicio"=>Carbon::parse('2019-1-22 22:30:00')],
+            ["nombre_obra"=>"Romeo y Julieta", "inicio"=>Carbon::parse('2019-1-23 20:00:00')],
     	];
 
     	for($i=0;$i<count($sesiones);$i++){

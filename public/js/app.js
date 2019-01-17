@@ -68,33 +68,55 @@ $(function() {
   })
 
   $('button.fc-prev-button').click(function(){
-    
+
+  	mes--;
+  	if(mes==0){
+  		mes=12;
+  		year--;
+  	}
+	recargaCalendario();  	
+  });
+
+
+  $('button.fc-next-button').click(function(){
+	mes++;
+  	if(mes==13){
+  		mes=1;
+  		year++;
+  	}
+  	recargaCalendario();
+  });
+
+  $('.fc-hoy-button').click(function(){
+    mes=mes_inicial;
+    year=year_inicial;
+    recargaCalendario();
+  });
+
+});
+
+
+function recargaCalendario(){
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
+
     $.ajax({
         type: "POST",
-        url: '<?= url('/'); ?>/generateExcel/tst/tst/tst/tst/tst/tst/tst/tst',
-        data: {search_id: <?= $search->id; ?>},
+        url: url_base+'/recarga_calendario',
+        data: {mes: mes,year: year, nombre_obra: $("#select_obra").val()},
         success: function (datos) {
-            
-            
-            
-            
-            location.href="<?= url('/'); ?>/excel/"+datos;
+            var obj = jQuery.parseJSON( datos );
+            colores=[];
+			$.each(obj.colores, function(i, item) {
+			    colores.push(item);
+			});
+  			$('#calendar').fullCalendar('getView').dayGrid.renderGrid();
+
         }
     });
 
-
-  });
-  $('.fc-button-next span').click(function(){
-    
-  });
-  $('.fc-hoy-button').click(function(){
-    	
-  });
-
-});
-
+}

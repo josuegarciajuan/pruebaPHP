@@ -13,5 +13,6 @@
 
 
 
-Route::get('/', 'IndexController@show');
-Route::get('/', 'IndexController@test');
+
+Route::get('/{nombre_obra?}', 'IndexController@show');
+Route::post('recarga_calendario', 'IndexController@recargaCalendario');

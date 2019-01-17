@@ -11,7 +11,13 @@
 			@endfor
 		];
 	var hoy = "{{$hoy}}";
-	console.log(colores)
+	var mes = "{{$mes}}";
+	var year = "{{$year}}";
+	var mes_inicial = "{{$mes}}";
+	var year_inicial = "{{$year}}";
+	var url_base="{{ url('/') }}";
+
+	
 </script>
 
 
