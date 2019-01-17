@@ -8,8 +8,9 @@ use App\Reserva;
 use App\Butaca;
 use App\User;
 
-
 use Carbon\Carbon;
+use App\Mail\reservaCorrecta;
+use Illuminate\Support\Facades\Mail;
 
 class IndexController extends Controller
 {
@@ -408,7 +409,6 @@ class IndexController extends Controller
 
     	$butacas=explode(",", $request->butacas_h[0]);
 
-
 		$reserva=new Reserva([
 			'sesion_id' => $request->id_sesion_h,
 			'user_id' => $user->id,
@@ -431,6 +431,11 @@ class IndexController extends Controller
 
         }
     	
+        Mail::to($user)->send(new reservaCorrecta($user->name,$user->surname,Config('constants.options.nombre_teatro'),Carbon::parse($reserva->sesion->inicio)->format('Y-m-d'),Carbon::parse($reserva->sesion->inicio)->format('H:i'),$reserva->num_butacas,$request->butacas_h[0],$user->email));
+
+
+
+
         return redirect('/form/exito');
     }
 
