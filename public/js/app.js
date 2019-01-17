@@ -164,7 +164,8 @@ function carga_sesiones(date){
     });	
 }
 function cargaSala(id=0){
-	
+	butacas_reservadas=[];
+
 	if(id==0){
 		id=$('#selectObra').val();
 	}

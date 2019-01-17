@@ -354,7 +354,6 @@ class IndexController extends Controller
 		        ]);
 		        $butaca->save();
 
-		        //lanzar cron
 			}
 
     	}else{
