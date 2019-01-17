@@ -310,4 +310,86 @@ class IndexController extends Controller
 
     }
 
+
+    /**
+     * intenta bloquear una butaca, si ya lo estaba devuelve error, si no lo esta la resertva y lanza cron para desreservarla en 10 min
+     *
+     * @param   request (id_sesion,fila,columna,array de butacas reservadas)
+     * @return codigo que identifica q ha pasado, si se ha reservado, no o ya estaba
+     */
+    public function bloquear(Request $request){
+
+    	$id_sesion=$request->id_sesion;
+    	$fila=$request->fila;
+    	$columna=$request->columna;
+    	$butacas_reservadas=$request->reservadas;
+
+    	$reservada="true";
+    	//butacas bloqueadas
+    	$butaca=Butaca::where("sesion_id",$id_sesion)->where("fila",$fila)->where("sesion_id",$columna)->first();
+
+    	if(!$butaca){
+	    	//butacas reservadas:
+			$butaca=Butaca::whereHas('sesion', function ($query) use ($id_sesion,$fila,$columna) {
+	    		$query->where('sesion_id', $id_sesion);
+	    		$query->where('fila', $fila);
+	    		$query->where('columna', $columna);
+			})->first();
+
+			if($butaca){
+
+				if($this->compruebaSiLaReservoYo($fila,$columna,$butacas_reservadas)){
+					$butaca->delete();					
+					$reservada="desmarca";	
+				}else{
+					$reservada="false";	
+				}
+				
+
+			}else{
+				$butaca=new Butaca([
+                'sesion_id' => $id_sesion,
+                'fila' => $fila,
+                'columna' => $columna,
+		        ]);
+		        $butaca->save();
+
+		        //lanzar cron
+			}
+
+    	}else{
+    		if($this->compruebaSiLaReservoYo($fila,$columna,$butacas_reservadas)){
+				$butaca->delete();		
+				$reservada="desmarca";				
+			}else{
+				$reservada="false";	
+			}
+    	}
+    	return $reservada;
+
+    }
+
+
+    /**
+     * comprueba si una butaca en base a su fia columa, la tengo reservada yo ya recorriendo el aray de mios reservadas
+     *
+     * @param   $fila,$columna,$butacas_reservadas
+     * @return boolean
+     */
+    private function compruebaSiLaReservoYo($fila,$columna,$butacas_reservadas){
+    	
+    	$reservadaXmi=false;
+    	if($butacas_reservadas){
+	    	for($i=0;$i<count($butacas_reservadas);$i++){
+	    		$aux=explode("_", $butacas_reservadas[$i]);
+	    		$fila_r=$aux[0];
+	    		$columna_r=$aux[1];
+	    		if($fila_r==$fila and $columna_r==$columna){
+	    			$reservadaXmi=true;
+	    		}
+	    	}
+	   	}
+    	return $reservadaXmi;
+    }
+
 }

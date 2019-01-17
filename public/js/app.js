@@ -189,13 +189,13 @@ function cargaSala(id=0){
         		html+="<tr>";
         		for(j=1;j<=columnas;j++){
         			
-        			txt="L";
+        			txt="<span id='"+i+"_"+j+"' onclick='bloquear("+id+","+i+","+j+")'>L</span>";
 					$.each(obj, function(w, item) {
 						if(item.fila==i && item.columna==j && item.ocupada=="true"){
 							txt="X";
 						}	
 					});
-					html+="<td>"+txt+"</td>";
+					html+="<td >"+txt+"</td>";
 
         		}	
         		html+="</tr>";
@@ -207,4 +207,53 @@ function cargaSala(id=0){
 
 
 	
+}
+function bloquear(id_sesion,fila,columna){
+	//manda a reservar, o devuelve exito o qe ya estaba ocupado, lo marco como ocupado sin repintar todo solo repintaria en caso de ocupado de rojo
+	//si exito guardso en array los asientos reservados, atencion se puede desclikar un asiento  pa saber si es mio tenia qe estar clickado
+
+	//pa saver si estoy desclickando le mando el array de las ocupadas si esta ocupada y es mia es por qe qiuero dfesclickar
+
+//
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $.ajax({
+        type: "POST",
+        url: url_base+'/bloquear',
+        data: {id_sesion: id_sesion,fila: fila, columna: columna, reservadas: butacas_reservadas},
+        success: function (datos) {
+        	//alert(datos);
+        	//var obj = jQuery.parseJSON( datos );
+        	//console.log(obj);
+
+        	switch(datos){
+        		case "true": //se ha reservado con exito el asiento lo paso a pintar y gardar al array
+        			$("#"+fila+"_"+columna).html("J");
+        			butacas_reservadas.push(fila+"_"+columna);
+        			break;
+        		case "false":  //ya estaba reservado, mensajito de alerta, y lo marco como ya reservado
+        			alert("Esta butaca ha suido reservada mientras tenia la ventana abierta.");
+        			$("#"+fila+"_"+columna).html("X");
+        			break;	
+        		case "desmarca":  //lo desmarco y lo borro de la lista
+        			$("#"+fila+"_"+columna).html("L");
+        			for(i=0;i<butacas_reservadas.length;i++){
+    					if(butacas_reservadas[i]==fila+"_"+columna){
+							index = butacas_reservadas.indexOf(fila+"_"+columna);
+							if (index > -1) {
+							  butacas_reservadas.splice(index, 1);
+							}
+    					}
+        			}
+        			break;	
+        	}
+
+        }
+    });	
+
 }

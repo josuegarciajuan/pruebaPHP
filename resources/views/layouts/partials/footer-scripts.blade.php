@@ -18,7 +18,7 @@
 	var url_base="{{ url('/') }}";
 	var filas = "{{$filas}}";
 	var columnas = "{{$columnas}}";
-
+	var butacas_reservadas=[];
 </script>
 
 

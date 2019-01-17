@@ -18,3 +18,4 @@ Route::get('/{nombre_obra?}', 'IndexController@show');
 Route::post('recarga_calendario', 'IndexController@recargaCalendario');
 Route::post('carga_sesiones', 'IndexController@cargaSesiones');
 Route::post('carga_salon', 'IndexController@cargaSalon');
+Route::post('bloquear', 'IndexController@bloquear');
