@@ -16,8 +16,9 @@
 	var mes_inicial = "{{$mes}}";
 	var year_inicial = "{{$year}}";
 	var url_base="{{ url('/') }}";
+	var filas = "{{$filas}}";
+	var columnas = "{{$columnas}}";
 
-	
 </script>
 
 

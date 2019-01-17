@@ -164,6 +164,7 @@ function carga_sesiones(date){
     });	
 }
 function cargaSala(id=0){
+	
 	if(id==0){
 		id=$('#selectObra').val();
 	}
@@ -174,16 +175,31 @@ function cargaSala(id=0){
         }
     });
 
+
     $.ajax({
         type: "POST",
         url: url_base+'/carga_salon',
         data: {id: id},
         success: function (datos) {
-        	//alert(datos);
-            var obj = jQuery.parseJSON( datos );
+        	//console.log(datos);
+        	var obj = jQuery.parseJSON( datos );
 
+        	html="";
+        	for(i=1;i<=filas;i++){
+        		html+="<tr>";
+        		for(j=1;j<=columnas;j++){
+        			
+        			txt="L";
+					$.each(obj, function(w, item) {
+						if(item.fila==i && item.columna==j && item.ocupada=="true"){
+							txt="X";
+						}	
+					});
+					html+="<td>"+txt+"</td>";
 
-    
+        		}	
+        		html+="</tr>";
+        	}
             $('#salon').html(html);
 
         }

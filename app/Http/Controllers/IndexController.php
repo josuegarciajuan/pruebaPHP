@@ -85,8 +85,11 @@ class IndexController extends Controller
 		$data["mes"]=date("m");
 		$data["year"]=date("Y");
 
+		$data["filas"]=Config('constants.options.filas_sala');
+		$data["columnas"]=Config('constants.options.columnas_sala');
 
-		$data["salon"]=$this->cargaSalon($request->id);
+
+		//$data["salon"]=$this->cargaSalon($request->id);
     	
     	//dd($data);
         return $data;
@@ -271,33 +274,39 @@ class IndexController extends Controller
      * @param   id_sesion
      * @return array de butacas con sus estados
      */
-    private function cargaSalon($id_sesion){
+    public function cargaSalon(Request $request){
+    	$id_sesion=$request->id;
+    	
     	$salon=[];
-
-
-$butacas_totales=Config('constants.options.filas_sala')*Config('constants.options.columnas_sala');
-
 
 		//butacas resevadas en esa sesion  (directo el seiosn id)
 		$butacas_reservadas=Butaca::whereHas('sesion', function ($query) use ($id_sesion) {
     		$query->where('sesion_id', $id_sesion);
-		})->get();
+		})->get()->toArray();
 		 
+		
+
 		//butacas bloqueadas por esa sesion		(sacar las reservas con sesion_id)
-		$butacas_bloqueadas=Butaca::where("sesion_id",$id_sesion)->get()
+		$butacas_bloqueadas=Butaca::where("sesion_id",$id_sesion)->get()->toArray();
+		
 
 		$butacas_ocupadas = array_merge($butacas_reservadas, $butacas_bloqueadas);
-
-
+		
 		for($i=1;$i<=Config('constants.options.filas_sala');$i++){
 			for($j=1;$j<=Config('constants.options.columnas_sala');$j++){
-
+				$ocupada="false";
+				for ($b=0;$b<count($butacas_ocupadas);$b++) {
+					if($butacas_ocupadas[$b]["fila"]==$i and $butacas_ocupadas[$b]["columna"]==$j){
+						$ocupada="true";
+					}
+				}
+				$salon[]=["fila"=>$i,"columna"=>$j,"ocupada"=>$ocupada];
 			}
 		}
+//		dd($salon);
 
 
-    	return $salon;
-
+    	return json_encode($salon);
 
     }
 
