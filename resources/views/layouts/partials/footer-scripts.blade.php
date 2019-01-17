@@ -26,6 +26,7 @@
 		}
 	@endisset
 
+	var url_images="{{ asset('images') }}";
 	
 </script>
 

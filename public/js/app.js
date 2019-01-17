@@ -214,15 +214,15 @@ function cargaSala(id=0){
         	//console.log(datos);
         	var obj = jQuery.parseJSON( datos );
 
-        	html="";
+        	html="<tr class='escenario'><td colspan='"+columnas+"' align='center'>Escenario</td></tr>";
         	for(i=1;i<=filas;i++){
         		html+="<tr>";
         		for(j=1;j<=columnas;j++){
         			
-        			txt="<span id='"+i+"_"+j+"' onclick='bloquear("+id+","+i+","+j+")'>L</span>";
+        			txt="<span id='"+i+"_"+j+"' onclick='bloquear("+id+","+i+","+j+")'><img class='butacas' src='"+url_images+"/azul.png'></span>";
 					$.each(obj, function(w, item) {
 						if(item.fila==i && item.columna==j && item.ocupada=="true"){
-							txt="X";
+							txt="<img class='butacas' src='"+url_images+"/rojo.png'>";
 						}	
 					});
 					html+="<td >"+txt+"</td>";
@@ -257,7 +257,7 @@ function bloquear(id_sesion,fila,columna){
 
         	switch(datos){
         		case "true": //se ha reservado con exito el asiento lo paso a pintar y gardar al array
-        			$("#"+fila+"_"+columna).html("J");
+        			$("#"+fila+"_"+columna).html("<img class='butacas' src='"+url_images+"/seleccionado.png'>");
         			butacas_reservadas.push(fila+"_"+columna);
         			break;
         		case "false":  //ya estaba reservado, mensajito de alerta, y lo marco como ya reservado
@@ -265,7 +265,7 @@ function bloquear(id_sesion,fila,columna){
         			$("#"+fila+"_"+columna).html("X");
         			break;	
         		case "desmarca":  //lo desmarco y lo borro de la lista
-        			$("#"+fila+"_"+columna).html("L");
+        			$("#"+fila+"_"+columna).html("<img class='butacas' src='"+url_images+"/azul.png'>");
         			for(i=0;i<butacas_reservadas.length;i++){
     					if(butacas_reservadas[i]==fila+"_"+columna){
 							index = butacas_reservadas.indexOf(fila+"_"+columna);

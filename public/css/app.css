@@ -7,3 +7,12 @@
 	height:50px;
 }
 
+.escenario{
+	font-weight:bold;
+	color:white;
+	background: repeating-linear-gradient(45deg,#606dbc,#606dbc 10px,#465298 10px,#465298 20px)
+}
+.butacas{
+	width:25px;
+	cursor:pointer;
+}
