@@ -17,7 +17,6 @@ class Reservas extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->integer('sesion_id')->unsigned();
-            $table->date('fecha');
             $table->integer('num_butacas')->unsigned();
 
             $table->timestamps();

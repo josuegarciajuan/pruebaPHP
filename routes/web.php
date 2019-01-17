@@ -14,3 +14,4 @@
 
 
 Route::get('/', 'IndexController@show');
+Route::get('/', 'IndexController@test');
