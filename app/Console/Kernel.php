@@ -28,8 +28,9 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function () {
 
+
             $date = new \DateTime;
-            $date->modify('-10 minutes');
+            $date->modify('-'.Config('constants.options.minutos_bloqueo_butaca').' minutes');
             $formatted_date = $date->format('Y-m-d H:i:s');
 
             Butaca::whereNotNull("sesion_id")->where("created_at","<",$formatted_date)->delete();
